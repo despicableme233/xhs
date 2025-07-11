@@ -1,8 +1,5 @@
 package com.quanxiaoha.framework.common.constant;
 
-import lombok.Data;
-
-
 public class RedisKeyConstants {
     /**
      * 验证码 KEY 前缀
@@ -29,8 +26,8 @@ public class RedisKeyConstants {
      * 构建用户-角色Key
      *
      */
-    public static String buildUserRoleKey(String phone) {
-        return USER_ROLE_KEY_PREFIX + phone;
+    public static String buildUserRoleKey(String userId) {
+        return USER_ROLE_KEY_PREFIX + userId;
     }
 
 }

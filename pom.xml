@@ -24,6 +24,8 @@
         <module>xiaoha-framework</module>
         <module>xiaoha-framework/xiaoha-common</module>
         <module>xiaohashu-gateway</module>
+        <module>xiaohashu-oss</module>
+        <module>xiaohashu-oss/xiaohashu-oss-api</module>
     </modules>
 
     <properties>

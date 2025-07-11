@@ -13,8 +13,10 @@ import com.quanxiaoha.framework.common.enums.ResponseCodeEnum;
 import com.quanxiaoha.framework.common.exception.BizException;
 import com.quanxiaoha.framework.common.response.Response;
 import com.quanxiaoha.framework.common.util.JsonUtils;
+import com.quanxiaoha.xiaohashu.auth.domain.dataobject.RoleDO;
 import com.quanxiaoha.xiaohashu.auth.domain.dataobject.UserDO;
 import com.quanxiaoha.xiaohashu.auth.domain.dataobject.UserRoleDO;
+import com.quanxiaoha.xiaohashu.auth.domain.mapper.RoleDOMapper;
 import com.quanxiaoha.xiaohashu.auth.domain.mapper.UserDOMapper;
 import com.quanxiaoha.xiaohashu.auth.domain.mapper.UserRoleDOMapper;
 import com.quanxiaoha.xiaohashu.auth.model.vo.user.UserLoginReqVO;
@@ -48,6 +50,8 @@ public class UserServiceImpl implements UserService {
     @Resource
     private TransactionTemplate transactionTemplate;
 
+    @Resource
+    private RoleDOMapper roleDOMapper;
 
 
     /**
@@ -108,7 +112,11 @@ public class UserServiceImpl implements UserService {
         return transactionTemplate.execute(status -> {
                     try {
                         Long xiaoHaShuId = redisTemplate.opsForValue().increment(RedisKeyConstants.XIAOHASHU_ID_AUTOINCREMENT_KEY);
-
+                        //给用户分配一个角色（可分配默认角色）
+                        RoleDO roleDO = roleDOMapper.selectByPrimaryKey(RoleConstants.COMMON_USER_ROLE_ID);
+                        //将该用户角色id存入list列表中，设置初始容量为1，避免扩容开销
+                        List<String> roles = new ArrayList<>(1);
+                        roles.add(roleDO.getRoleKey());
                         UserDO userDO = UserDO.builder()
                                 .phone(phone)
                                 .xiaohashuId(String.valueOf(xiaoHaShuId))
@@ -133,8 +141,8 @@ public class UserServiceImpl implements UserService {
                         userRoleDOMapper.insert(userRoleDO);
 
                         //将该用户的角色ID存入Redis中
-                        List<Long> roles = new ArrayList<>();
-                        roles.add(RoleConstants.COMMON_USER_ROLE_ID);
+                        List<Long> rolesList = new ArrayList<>();
+                        rolesList.add(RoleConstants.COMMON_USER_ROLE_ID);
                         String userRolesKey = RedisKeyConstants.buildUserRoleKey(phone);
                         redisTemplate.opsForValue().set(userRolesKey, JsonUtils.toJsonString(roles));
                         return userId;

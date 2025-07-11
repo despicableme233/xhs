@@ -61,6 +61,10 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.quanxiaoha</groupId>
+            <artifactId>xiaoha-common</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

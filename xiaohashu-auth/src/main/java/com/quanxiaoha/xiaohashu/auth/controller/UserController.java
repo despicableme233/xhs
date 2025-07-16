@@ -7,6 +7,7 @@ import com.quanxiaoha.xiaohashu.auth.service.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,7 +21,7 @@ public class UserController {
 
     @PostMapping("/login")
     @ApiOperationLog(description = "用户登录/自动注册")
-    public Response<String> loginAndRegister(UserLoginReqVO userLoginReqVO) {
+    public Response<String> loginAndRegister(@RequestBody UserLoginReqVO userLoginReqVO) {
         return userService.loginAndResister(userLoginReqVO);
     }
 

@@ -24,6 +24,7 @@ import com.quanxiaoha.xiaohashu.auth.service.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -52,6 +53,9 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private RoleDOMapper roleDOMapper;
+
+//    @Resource
+//    private PasswordEncoder passwordEncoder;
 
 
     /**
@@ -96,10 +100,23 @@ public class UserServiceImpl implements UserService {
                 break;
             case PASSWORD:
                 String password = userLoginReqVO.getPassword();
+                //根据手机号查询
+                UserDO userDO1 = userDOMapper.selectByPhone(phone);
+                //判断手机号是否注册
+                if (Objects.isNull(userDO1)) {
+                    throw new BizException(ResponseCodeEnum.PHONE_NOT_REGISTER);
+                }
+                //密文密码
+                String encryptedPassword = userDO1.getPassword();
+//                if (!passwordEncoder.matches(password, encryptedPassword)) {
+//                    throw new BizException(ResponseCodeEnum.PHONE_OR_PASSWORD_ERROR);
+//                }
+                userId = userDO1.getId();
                 break;
             default:
                 break;
         }
+        log.info("已注册用户的id：{}", userId);
         //SaToken登录用户，并返回token令牌
         StpUtil.login(userId);
         //获取Token令牌
@@ -129,23 +146,24 @@ public class UserServiceImpl implements UserService {
                         //入库
                         userDOMapper.insert(userDO);
 
-
-                        Long userId = userDO.getId();
+                        UserDO registeredUserDO = userDOMapper.selectByPhone(phone);
+                        log.info("已注册用户的id：{}", registeredUserDO.getId());
+                        Long registeredUserId = registeredUserDO.getId();
+//                        Long userId = userDO.getId();
                         UserRoleDO userRoleDO = UserRoleDO.builder()
-                                .userId(userId)
+                                .userId(registeredUserId)
                                 .roleId(RoleConstants.COMMON_USER_ROLE_ID)
                                 .createTime(LocalDateTime.now())
                                 .updateTime(LocalDateTime.now())
                                 .isDeleted(DeletedEnum.NORMAL.getCode())
                                 .build();
                         userRoleDOMapper.insert(userRoleDO);
-
-                        //将该用户的角色ID存入Redis中
+//        将该用户的角色ID存入Redis中
                         List<Long> rolesList = new ArrayList<>();
                         rolesList.add(RoleConstants.COMMON_USER_ROLE_ID);
                         String userRolesKey = RedisKeyConstants.buildUserRoleKey(phone);
                         redisTemplate.opsForValue().set(userRolesKey, JsonUtils.toJsonString(roles));
-                        return userId;
+                        return registeredUserId;
                     } catch (Exception e) {
                         //回滚事务
                         status.setRollbackOnly();

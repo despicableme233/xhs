@@ -26,6 +26,9 @@
         <module>xiaohashu-gateway</module>
         <module>xiaohashu-oss</module>
         <module>xiaohashu-oss/xiaohashu-oss-api</module>
+        <module>xiaohashu-user</module>
+        <module>xiaohashu-user/xiaohashu-user-api</module>
+        <module>xiaohashu-user/xiaohashu-user-biz</module>
     </modules>
 
     <properties>
@@ -55,6 +58,7 @@
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <mybatis-generator-maven-plugin.version>1.3.5</mybatis-generator-maven-plugin.version>
         <nacos-config.version>0.3.0-RC</nacos-config.version>
+        <minio.version>8.2.1</minio.version>
     </properties>
 
     <!-- 统一依赖管理 -->
@@ -176,6 +180,13 @@
                 <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-reactor-spring-boot3-starter</artifactId>
                 <version>${sa-token.version}</version>
+            </dependency>
+
+            <!-- 对象存储 Minio -->
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

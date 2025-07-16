@@ -198,7 +198,7 @@
   </update>
 
   <select id="selectByPhone" resultMap="BaseResultMap">
-      select id, password
+      select *
       from t_user
       where phone = #{phone}
   </select>

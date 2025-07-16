@@ -37,6 +37,6 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
 //       todo: 调用短信发送服务
         log.info("==> 手机号: {}, 已发送验证码：【{}】", phone, code);
         redisTemplate.opsForValue().set(key, code, 3, TimeUnit.MINUTES);
-        return Response.success();
+        return Response.success(code);
     }
 }
